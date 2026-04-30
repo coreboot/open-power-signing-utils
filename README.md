@@ -93,38 +93,38 @@ support the GNU toolchain enabled method of building, and a
 
 To build with full GNU toolchain support, run "build_all.sh" passing
 "gnu" on the command-line:
-
+```
 $ build_all.sh gnu
-
+```
 This utilizes the included "configure.ac" and "Makefile.am", and is
 equivalent to running:
-
+```
 $ libtoolize -f && aclocal && autoheader && automake -a && autoconf && \
   configure && make
-
+```
 Or:
-
+```
 $ autoreconf -i -Wno-unsupported && ./configure && make
-
+```
 To clean the project, including removing *all* GNU toolchain support
 files, run:
-
+```
 $ clean_all.sh gnu
-
+```
 To build "lite" using a simple Makefile and config.h, run "build_all.sh"
 passing "lite" on the command-line (or no option at all, as "lite" is the
 default):
-
+```
 $ build_all.sh lite
-
+```
 This utilizes the included "configure.h.lite" and "Makefile.lite". The
 script simply copies these files into place and runs "make".
 
 To clean the project, run the following, which is really just doing a
 "make clean":
-
+```
 $ clean_all.sh lite
-
+```
 Building the project with v2 container support
 --------------------
 
@@ -135,8 +135,9 @@ This library can be found at : https://github.com/IBM/mlca/
 
 To build with full GNU toolchain support, run "build_all.sh" passing
 "gnu" on the command-line:
-
+```
 $ MLCA_PATH=<Path to built mlca repo> ./build_all.sh gnuv2
+```
 
 Building the project with v3 container support
 --------------------
@@ -148,13 +149,15 @@ This library can be found at : https://github.com/IBM/mlca/
 
 To build with full GNU toolchain support, run "build_all.sh" passing
 "gnu" on the command-line:
-
+```
 $ MLCA_PATH=<Path to built mlca repo> ./build_all.sh gnuv3
+```
 
 AIX: Building the project with v1 container support
 --------------------
-
+```
 $ ./build_all.sh aixv3
+```
 
 AIX: Building the project with v3 container support
 --------------------
@@ -164,26 +167,36 @@ mldsa-87 support.
 
 This library can be found at : https://github.com/IBM/mlca/
 
-$ MLCA_PATH=<Path to built mlca repo> ./build_all.sh aixv3
-
+To build MLCA:
+```
+mkdir build
+cd build
+export OBJECT_MODE=64
+cmake ..
+make mlca
+```
+To build the signing utils:
+```
+MLCA_PATH=<Path to built mlca repo> ./build_all.sh aixv3
+```
 
 Installing the project
 --------------------
 To install the project (executable files) locally, after running the
 preferred build method above:
-
+```
 $ make install
-
+```
 To uninstall:
-
+```
 $ make uninstall
-
+```
 The files install to /usr/local/bin by default.  You must have write
 permission to this directory.  To install to a different directory:
-
+```
 $ make install bindir=/preferred/install/path/
 $ make uninstall bindir=/preferred/install/path/
-
+```
 Signing HOWTO
 -------------
 
@@ -199,12 +212,12 @@ The included shell script "sign-with-local-keys.sh" demonstrates the
 container build operation. First, the program builds enough of the
 container to create the prefix and software headers, and dumps them to
 the specified files:
-
+```
 $ ./create-container -a hw_key_a.key -b hw_key_b.key -c hw_key_c.key \
                      -p sw_key_a.key \
                       --payload image.bin --imagefile container.out \
                       --dumpPrefixHdr prefix_hdr --dumpSwHdr software_hdr
-
+```
 where the *.key files contain the public keys in PEM format, the payload
 is the firmware image to be protected by this container, the output file
 is the completed container and the prefix_hdr and software_hdr files
@@ -227,26 +240,26 @@ to use the same key thrice.)
 Next, the prefix and software headers are signed by the hardware and
 software keys, respectively. These may be done with simple openssl
 operations:
-
+```
 $ openssl dgst -SHA512 -sign hw_key_a.key prefix_hdr > hw_key_a.sig
 $ openssl dgst -SHA512 -sign hw_key_b.key prefix_hdr > hw_key_b.sig
 $ openssl dgst -SHA512 -sign hw_key_c.key prefix_hdr > hw_key_c.sig
 
 $ openssl dgst -SHA512 -sign sw_key_a.key software_hdr > sw_key_p.sig
-
+```
 In this case the .key files *must* be the private keys. The .sig files are
 the resulting signatures in DER format. (The prefix_hdr and software_hdr
 files have now been consumed and may be discarded.)
 
 Finally, create-container is run one more time to add the signatures and
 complete the container:
-
+```
 $ ./create-container -a hw_key_a.key -b hw_key_b.key -c hw_key_c.key \
                      -p sw_key_a.key \
                      -A hw_key_a.sig -B hw_key_b.sig -C hw_key_c.sig \
                      -P sw_key_p.sig \
                       --payload image.bin --imagefile container.out
-
+```
 All input files have the same meaning as on the first pass: the *.key
 files may be the public or private key in PEM format. The .sig files are
 the signatures in DER format.
